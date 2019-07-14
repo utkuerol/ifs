@@ -1,28 +1,10 @@
-# Start Instructions
-
-Django, DB and OcalAPI are already running on the server. Only an ssh-tunneling is required to access the website. 
-
-Superuser is "ifs", password to ifs is "ifsifsifs"
-
-A normal test user is "user", password to user is "useruser"
-
- # forward ssh remote:8000 to localhost:8000
+# Interactive Feedback System
 
 
-*  ssh -N -L 8000:127.0.0.1:8000 erol@ravenclaw.ipd.kit.edu     #password= erol01ab
-
----
-
- # start ocalapi docker
+The software project Interactive Feedback System (IFS) is developed as part of the module "Praxis der Softwareentwicklung" (Software Development Practice) at the Karlsruhe Institute of Technology. The main objective of the project is to provide a Web platform to evaluate Active Learning in which the classification results of OcalAPI (https://github.com/englhardt/OcalAPI.jl) are reassessed by user feedbacks and the user behaviour during this process is recorded.
 
 
-*  ssh erol@ravenclaw.ipd.kit.edu -p22    #password= erol01ab
-
-*  .. (start docker as explained in api documentation)
-
----
-
-# Build Instructions From Scratch
+# Build Instructions
 
 
 *  cd ifs   (project path)
