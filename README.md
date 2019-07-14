@@ -3,6 +3,10 @@
 
 The software project Interactive Feedback System (IFS) is developed as part of the module "Praxis der Softwareentwicklung" (Software Development Practice) at the Karlsruhe Institute of Technology. The main objective of the project is to provide a Web platform to evaluate Active Learning in which the classification results of OcalAPI (https://github.com/englhardt/OcalAPI.jl) are reassessed by user feedbacks and the user behaviour during this process is recorded.
 
+Note that this is an external git repository of the project, hiding commit history. 
+
+Other contributors of the project: Alaa Mousa, Ari Nubar Boyacioglu, Mazen Ebada, Melis Lekesiz
+
 
 # Build Instructions
 
