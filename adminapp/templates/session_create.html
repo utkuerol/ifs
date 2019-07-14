@@ -1,0 +1,63 @@
+{% extends 'layouts/app.html' %}
+{% block title %}Invite Users to an Experiment!{% endblock %}
+{% block content %}
+
+    <div class="card">
+        <div class="card-header" style="font-weight: bold">Create Experiment</div>
+
+        <div class="card-body">
+
+            <form enctype="multipart/form-data" method="post">
+                {% csrf_token %}
+
+                {% if  form.errors %}
+                    <div class="alert alert-danger">
+                        <b>Error!</b>
+                        The given input was wrong please try again!
+                    </div>
+                {% endif %}
+                <div class="form-group row no-validation">
+                    <label for="name" class="col-sm-4 col-form-label text-right">
+                        Setup:
+                    </label>
+                    <div class="col-sm-6">
+                        <select name="setup_id" data-placeholder="Please select a setup" class="select2" required>
+                            <option></option>
+                            {% for setup in setups %}
+                                {% if selected_setup is not none and setup == selected_setup %}
+                                    <option selected="selected" value="{{ setup.id }}">{{ setup.name }}</option>
+                                {% else %}
+                                    <option value="{{ setup.id }}">{{ setup.name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row no-validation">
+                    <label for="name" class="col-sm-4 col-form-label text-right">
+                        Users to invite:
+                    </label>
+                    <div class="col-sm-6">
+                        <select name="user_ids" data-placeholder="Please select users to invite" class="select2"
+                                multiple required>
+                            <option></option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row mb-0">
+                    <div class="offset-md-4 col-md-6">
+                        <button type="submit" class="btn btn-primary">
+                            Create
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'layouts/app.html' %}
+
+{% block title %}Delete Experiment{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header flex items-center justify-between">
+            <div><b>Are you sure you want to abort your experiment?</b></div>
+            <a href="/userapp/{{ user.pk }}/ongoing_experiments" class="hover:text-red">
+                Back
+            </a>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <p>This session will be deleted and the answered questions cannot be accessed anymore.</p>
+                <div class="form-group row mb-0">
+                    <div class="col-md-6">
+                        <input type="submit" class="btn btn-primary" value="Confirm">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

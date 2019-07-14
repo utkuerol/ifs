@@ -1,0 +1,51 @@
+{% extends 'layouts/app.html' %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                Datasets
+            </li>
+            <li class="breadcrumb-item">
+                Dataset Profile
+            </li>
+            <li class="breadcrumb-item active">
+                {{ dataset.name }}
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block title %}Dataset Profile{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-header flex items-center justify-between">
+            <b>Dataset Profile</b>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="update" class="btn btn-light mx-2">
+                    Edit
+                </a>
+                <a href="delete" class="btn btn-light mx-2 hover:text-red">
+                    Delete
+                </a>
+                <a href="/adminapp/setups?dataset_id={{ dataset.id }}" class="btn btn-light mx-2">
+                    See setups
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <p><b>Name: </b>{{ dataset.name }}</p>
+            <p><b>Description: </b>{{ dataset.description }}</p>
+            <p><b>Created At: </b>{{ dataset.date }}</p>
+            <p><b>Type: </b>{{ dataset.type }}</p>
+            <p><b>Feature File: </b><a href="/media/{{ dataset.feature_file }}" download>{{ dataset.feature_file }}</a>
+            </p>
+            <p><b>Raw File: </b><a href="/media/{{ dataset.raw_file }}" download>{{ dataset.raw_file }}</a></p>
+
+        </div>
+    </div>
+{% endblock %}

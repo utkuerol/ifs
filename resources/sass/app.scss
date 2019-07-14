@@ -1,0 +1,228 @@
+
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+// Notification Plugin
+@import "~toastr/build/toastr";
+
+body {
+    height: 100vh;
+    background-image: url("/static/assets/images/cloud-bg.png");
+}
+
+/** Navbar Tweaks */
+.navbar-ifs {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    padding: 0 1rem;
+}
+
+.navbar .dropdown-menu {
+    border-radius: 0 0 0.25rem 0.25rem;
+}
+
+/** Breadcrumbs */
+.breadcrumb {
+    background-color: #f7f7f7;
+    border-radius: 0.25rem;
+    border: 1px solid #dfdfdf;
+}
+
+.breadcrumb-item.active {
+    color: $blue;
+}
+
+/** Bootstrap Tweaks */
+.container {
+    transition: max-width 400ms ease;
+}
+.container-fluid {
+    max-width: 100%;
+    transition: max-width 400ms ease;
+}
+
+.col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6,
+.col-md-7, .col-md-8, .col-md-9, .col-md-11, .col-md-10, .col-md-12 {
+    transition: max-width 400ms ease;
+}
+
+b, strong {
+    font-weight: bold;
+}
+
+/** Tooltip Width Adjustment */
+.tooltip-inner {
+    max-width: 100% !important;
+}
+
+/** Accordion Nav Tabs */
+.nav-tabs {
+    height: auto;
+    // max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease-out;
+}
+
+.nav-tabs.open {
+    max-height: 500px;
+    transition: max-height 0.25s ease-in;
+}
+
+/** Custom CSS */
+.card {
+    margin-bottom: 20px;
+}
+
+.dropdown-header {
+    font-weight: 700;
+    padding: 3px 15px;
+    font-size: 12px;
+    color: #5f5c59;
+}
+
+.profile-picture-preview {
+    border-radius: 6px;
+    display: inline-block;
+    background-position: 50%;
+    background-size: cover;
+    height: 150px;
+    vertical-align: middle;
+    width: 150px;
+}
+
+.btn-upload input[type="file"] {
+    display: none;
+}
+
+.nav-link {
+    font-weight: bold;
+}
+
+.nav>li, .nav>li>a {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.nav-tabs .nav li.active a {
+    color: black;
+}
+
+.select2-search--inline,
+.select2-search__field {
+  width: 100% !important;
+}
+
+.nav>li>a {
+    padding: 10px 15px;
+}
+
+.nav>li>a:hover {
+    text-decoration: none;
+    font-weight: bold;
+    // background-color: #eee;
+}
+
+.nav a {
+    border-bottom: 1px solid #ebe7df;
+    border-left: 3px solid transparent;
+    color: #797572;
+}
+
+.nav>li.active {
+    border-left: 3px solid $blue;
+}
+
+.fancy { width:100%; text-align:center; border-bottom: 1px solid rgba(0, 0, 0, 0.125); line-height:0.1em; margin:30px 0; }
+.fancy span { background:#fff; padding:0 10px; }
+
+.nav-profile-picture {
+    border: 2px solid $blue;
+    border-radius: 50%;
+    padding: 2px;
+
+    height: 45px;
+    width: 45px;
+}
+
+.navbar-brand {
+    padding: 0;
+}
+
+.nav-item {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0px 15px;
+    min-height: 66px;
+}
+
+.navbar-nav {
+    min-height: 66px;
+}
+
+.nav-item:hover {
+    background-color: #f7f7f7;
+}
+
+.navbarDropdown {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    color: inherit;
+    background: none;
+    border-left: 3px solid $blue;
+}
+
+.nav>li.disabled>a {
+    // color: #b9b9b9;
+    cursor: not-allowed;
+}
+
+.nav>li.disabled>a:hover {
+    font-weight: normal;
+}
+
+.nav>li.disabled {
+    background:
+        /* On "top" */
+        repeating-linear-gradient(
+            135deg,
+            transparent,
+            transparent 10px,
+            #f7f7f7 10px,
+            #f7f7f7 20px
+        ),
+        /* on "bottom" */
+        linear-gradient(
+            to bottom,
+            #eaeaea,
+            #eaeaea
+        );
+}
+
+.btn-xs {
+    padding: .25rem .4rem;
+    font-size: .875rem;
+    line-height: .5;
+    border-radius: .2rem;
+}
+
+li.nav-item.active {
+    border-bottom: 2px solid $blue;
+}
+
+.required-field {
+    vertical-align: text-top;
+    font-size: 0.5em;
+    color: darkred;
+}

@@ -1,0 +1,138 @@
+{% extends 'layouts/app.html' %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                Datasets
+            </li>
+            <li class="breadcrumb-item active">
+                Create Dataset
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block title %}Create Dataset{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header flex items-center justify-between">
+            <b>Create Dataset</b>
+        </div>
+
+        <div class="card-body">
+            <div class="alert alert-info">
+                <strong>Please enter the information. </strong>
+                The required fields are marked with the <i class="fa fa-fw fa-asterisk required-field"></i> sign.
+            </div>
+
+            <form enctype="multipart/form-data" method="post">
+                {% csrf_token %}
+
+                {% if  form.errors %}
+                    <div class="alert alert-danger">
+                        <b>Error!</b>
+                        The given input was wrong please try again!
+                        {% if  form.non_field_errors %}
+                            {% for nonFieldError in form.non_field_errors %}
+                                <strong> <br> {{ nonFieldError|linebreaksbr }} </strong>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% for field in form %}
+
+                    <div class="form-group no-validation row">
+                        <label for="name" class="col-sm-4 col-form-label text-right">
+                            {{ field.label }}:
+                            <i class="fa fa-fw fa-asterisk required-field"></i>
+                        </label>
+                        <div class="col-sm-6">
+                            {% if field.field.widget.input_type == "select" %}
+                                <select data-placeholder="{{ field.label }}"
+                                        class="form-control select2 {% if field.errors %}
+                                            is-invalid
+                                        {% endif %}"
+                                        name="{{ field.html_name }}"
+                                        id="{{ field.auto_id }}"
+                                        data-allow-clear="true"
+                                >
+                                    {% for key,value in field.field.widget.choices %}
+                                        {% if key %}
+                                            <option value="{{ key }}">{{ value }}</option>
+                                        {% else %}
+                                            <option></option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+
+                            {% elif field.field.widget.input_type == "file" %}
+                                <div class="custom-file">
+                                    <input
+                                            id="{{ field.auto_id }}"
+                                            name="{{ field.html_name }}"
+                                            type="file"
+                                            class="custom-file-input"
+                                            required
+                                    >
+                                    <label class="custom-file-label" for="validatedCustomFile">Choose a file...</label>
+                                </div>
+                            {% else %}
+                                <input type="{{ field.field.widget.input_type }}" id="{{ field.auto_id }}"
+                                       name="{{ field.html_name }}"
+                                       placeholder="{{ field.label }}"
+                                       value="{{ field.value|default_if_none:'' }}"
+                                       class="form-control
+                                        {% if field.errors %}
+                                            is-invalid
+                                        {% endif %}">
+                            {% endif %}
+
+                            <div class="invalid-feedback">
+                                {% for error in field.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if field.help_text %}
+                            <label for="name" class="col-sm-2 col-form-label">
+                                <i data-toggle="tooltip" data-placement="top"
+                                   title="" class="fa fa-fw fa-question-circle"
+                                   data-original-title="{{ field.help_text|safe }}"></i>
+                            </label>
+                        {% endif %}
+
+                    </div>
+                {% endfor %}
+
+
+                <div class="form-group row mb-0">
+                    <div class="offset-md-4 col-md-6">
+                        <button id="create" type="submit" class="btn btn-primary">
+                            Create
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $('.custom-file-input').on('change', function (event) {
+            event.preventDefault();
+            /* Act on the event */
+
+            let file = event.target.files[0];
+            let fileName = file.name;
+
+            $(this).next().text(fileName);
+        });
+    </script>
+{% endblock %}

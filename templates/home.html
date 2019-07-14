@@ -1,0 +1,118 @@
+{% extends 'layouts/app.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+    {% if user.is_authenticated %}
+        {% if user.is_superuser %}
+            <div id="greetings-message-container" class="shadow bg-white p-4 mt-3 mb-5 rounded">
+                <h1 class="mb-0">
+                    Welcome <b>{{ user.username }}</b>!
+                </h1>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <ul class="home-list shadow hover:shadow-md rounded">
+                        <li class="li-head d-flex justify-content-between align-items-center">
+                            <span>Datasets</span>
+                            <i class="fa fa-fw fa-area-chart"></i>
+                        </li>
+                        <li class="li-item">
+                            <a id="create_dataset" href="/adminapp/datasets/new">Create Dataset</a>
+                        </li>
+                        <li class="li-item">
+                            <a id="list_dataset" href="/adminapp/datasets">See Datasets</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-4">
+                    <ul class="home-list shadow hover:shadow-md rounded">
+                        <li class="li-head d-flex justify-content-between align-items-center">
+                            <span>Setups</span>
+                            <i class="fa fa-fw fa-wrench"></i>
+                        </li>
+                        <li class="li-item">
+                            <a id="create_setup" href="/adminapp/setups/new">Create Setup</a>
+                        </li>
+                        <li class="li-item">
+                            <a id="list_setup" href="/adminapp/setups">See Setups</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-4">
+
+                    <ul class="home-list shadow hover:shadow-md rounded">
+                        <li class="li-head d-flex justify-content-between align-items-center">
+                            <span>Experiments</span>
+                            <i class="fa fa-fw fa-flask"></i>
+                        </li>
+                        <li class="li-item">
+                            <a id="create_experiment" href="/adminapp/experiments/new">Create Experiment</a>
+                        </li>
+                        <li class="li-item">
+                            <a id="list_experiment" href="/adminapp/experiments">See Experiments</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <div id="greetings-message-container" class="shadow bg-white p-4 mt-4 mb-5 rounded">
+                <h1 class="mb-0">
+                    Welcome <b>{{ user.username }}</b>!
+                </h1>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <ul class="home-list shadow hover:shadow-md rounded">
+                        <li class="li-head d-flex justify-content-between align-items-center">
+                            <span>Invitations</span>
+                            <i class="fa fa-fw fa-envelope-o"></i>
+
+                        </li>
+
+                        <li class="li-item">
+                            <a id="list_invitations" href="/userapp/{{ user.pk }}/invitations">See Invitations</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-sm-4">
+                    <ul class="home-list shadow hover:shadow-md rounded">
+                        <li class="li-head d-flex justify-content-between align-items-center">
+                            <span>My Ongoing Experiments</span>
+                            <i class="fa fa-fw fa-share-square-o"></i>
+                        </li>
+                        <li class="li-item">
+                            <a id="list_ongoing" href="/userapp/{{ user.pk }}/ongoing_experiments">See My Ongoing
+                                Experiments</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-sm-4">
+                    <ul class="home-list shadow hover:shadow-md rounded">
+                        <li class="li-head d-flex justify-content-between align-items-center">
+                            <span>My Participated Experiments</span>
+                            <i class="fa fa-flask"></i>
+                        </li>
+                        <li class="li-item">
+                            <a id="list_finished" href="/userapp/{{ user.pk }}/participated_experiments">See My
+                                Participated Experiments</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="bg-white shadow flex flex-col items-center p-4 rounded mt-5">
+            <h1 class="text-5xl text-center">Welcome to In-or-Out!</h1>
+            <p class="text-grey-darker text-center text-lg" style="max-width: 50%;">Interactive Feedback System</p>
+            <img src="{% static "assets/images/logo4.png" %}" alt="In_or_Out">
+            <p class="text-grey-darker text-center text-lg mt-5">You are not logged in.</p>
+            <a id="home-login" class="btn btn-primary btn-lg" href={% url 'login' %}>Log In</a>
+        </div>
+    {% endif %}
+{% endblock %}

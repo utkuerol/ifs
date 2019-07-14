@@ -1,0 +1,114 @@
+{% extends 'layouts/app.html' %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                Setups
+            </li>
+            <li class="breadcrumb-item">
+                Setup Profile
+            </li>
+            <li class="breadcrumb-item active">
+                {{ setup.name }}
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block title %}Setup Profile{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header flex items-center justify-between">
+            <b>Setup Profile</b>
+
+
+            <div class="d-flex justify-content-between align-items-center">
+                {% if setup.status != "final" %}
+                    <a href="update" class="btn btn-light mx-2">
+                        Edit
+                    </a>
+                {% endif %}
+
+                {% if setup.status == "final" %}
+                    <a href="finishedsessions" class="btn btn-light mx-2">
+                        See Finished Sessions
+                    </a>
+                {% endif %}
+                <a href="delete" class="btn btn-light mx-2 hover:text-red">
+                    Delete
+                </a>
+
+                {% if setup.status != "final" %}
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="start_experiment">
+                        <button class="btn btn-light mx-2" type="submit">Start Experiment</button>
+                    </form>
+                {% endif %}
+                {% if setup.status == "final" %}
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="send_invitation">
+                        <button class="btn btn-light mx-2" type="submit">Send invitation(s)</button>
+                    </form>
+                {% endif %}
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="clone">
+                    <button class="btn btn-light mx-2" type="submit">Clone</button>
+                </form>
+                {% if setup.status == "final" %}
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="export_all">
+                        <button class="btn btn-light mx-2" id="export" type="submit">Export</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card-body">
+            <h6 style="text-align: left"><strong><u>General Information</u></strong></h6>
+            <br>
+            <p style="margin-left: 20px"><b>Setup Name: </b>{{ setup.name }}</p>
+            <p style="margin-left: 20px"><b>Description: </b>{{ setup.description }}</p>
+            <p style="margin-left: 20px"><b>Created At: </b>{{ setup.date }}</p>
+            <p style="margin-left: 20px"><b>Dataset: </b><a
+                    href="{{ setup.dataset_id.get_absolute_url }}">{{ setup.dataset_id.name }}</a></p>
+            <hr>
+            <h6 style="text-align: left"><strong><u>Ocal API Settings</u></strong></h6>
+            <br>
+            <p style="margin-left: 20px"><b>Classifier: </b>{{ setup.classifier }}</p>
+            <p style="margin-left: 20px"><b>Query Strategy: </b>{{ setup.query_strategy }}</p>
+            <p style="margin-left: 20px"><b>Gamma: </b>{{ setup.gamma }}</p>
+            <p style="margin-left: 20px"><b>Cost Function C: </b>{{ setup.cost_function }}</p>
+            <p style="margin-left: 20px"><b>Feedback Mode: </b>{{ setup.feedback_mode }}</p>
+            <p style="margin-left: 20px"><b>Number of Iterations: </b>{{ setup.number_of_iterations }}</p>
+            <p style="margin-left: 20px"><b>Status: </b>{{ setup.status }}</p>
+            <hr>
+            <h6 style="text-align: left"><strong><u>Active Learning</u></strong></h6>
+            <br>
+            <p style="margin-left: 20px"><b>Unknown Allowed: </b>{{ setup.unknown_allowed }}</p>
+            <p style="margin-left: 20px"><b>Raw Data Visible: </b>{{ setup.raw_data_visible }}</p>
+            <p style="margin-left: 20px"><b>Feature Data Visible: </b>{{ setup.feature_data_visible }}</p>
+            <hr>
+            <h6 style="text-align: left"><strong><u>Subspace Details</u></strong></h6>
+            <br>
+            <p style="margin-left: 20px">
+                <b>Feature (X,Y): </b>
+                {% for x in setup.subspace_set.all %}
+                    ({{ x.feature_x_id }},{{ x.feature_y_id }})
+                {% endfor %}
+            </p>
+            <p style="margin-left: 20px">
+                <b>Subspace Gridpoints Amount (X,Y): </b>
+                {% for x in setup.subspace_set.all %}
+                    ({{ x.gridpoints_x }},{{ x.gridpoints_y }})
+                {% endfor %}
+            </p>
+
+        </div>
+    </div>
+{% endblock %}

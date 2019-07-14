@@ -1,0 +1,196 @@
+{% extends 'layouts/app.html' %}
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                Setups
+            </li>
+            <li class="breadcrumb-item active">
+                Create Setup
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+{% block title %}Create Setup{% endblock %}
+{% block content %}
+
+    <div class="card">
+        <div class="card-header" style="font-weight: bold">Create Setup</div>
+
+        <div class="card-body">
+
+            <div class="alert alert-info">
+                <strong>Please enter the information. </strong>
+                The required fields are marked with the <i class="fa fa-fw fa-asterisk required-field"></i> sign.
+            </div>
+
+            <form enctype="multipart/form-data" method="post">
+                {% csrf_token %}
+
+                {% for field in form %}
+
+                    <div class="form-group no-validation row">
+
+                        <label for="name" class="col-sm-4 col-form-label text-right">
+                            {% if field.auto_id == "id_dataset_id" %} <br><br> {% endif %}
+                            {{ field.label }}:
+                            <i class="fa fa-fw fa-asterisk required-field"></i>
+
+                        </label>
+                        <div class="col-sm-6">
+                            {% if field.auto_id == "id_dataset_id" %}
+                                <h6><u><strong>General Information</strong></u></h6>  <br> {% endif %}
+                            {% if field.field.widget.input_type == "select" %}
+                                <select data-placeholder="{{ field.label }}"
+                                        class="form-control select2 {% if field.errors %}
+                                            is-invalid
+                                        {% endif %}"
+                                        name="{{ field.html_name }}"
+                                        id="{{ field.auto_id }}"
+                                        data-allow-clear="true"
+                                >
+                                    {% for key,value in field.field.widget.choices %}
+                                        {% if key %}
+                                            <option value="{{ key }}">{{ value }}</option>
+                                        {% else %}
+                                            <option></option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+
+                            {% elif field.field.widget.input_type == "file" %}
+                                <div class="custom-file">
+                                    <input
+                                            id="{{ field.auto_id }}"
+                                            name="{{ field.html_name }}"
+                                            type="file"
+                                            class="custom-file-input"
+                                            required
+                                    >
+                                    <label class="custom-file-label" for="validatedCustomFile">Choose a file...</label>
+                                </div>
+
+                            {% elif field.label == "Gamma" or field.label == "Cost function" %}
+                                <input type="{{ field.field.widget.input_type }}" step="any" id="{{ field.auto_id }}"
+                                       name="{{ field.html_name }}"
+                                       placeholder="{{ field.label }}"
+                                       value="{{ field.value|default_if_none:'' }}"
+                                       class="form-control
+                                        {% if field.errors %}
+                                            is-invalid
+                                        {% endif %}">
+
+                            {% else %}
+                                <input type="{{ field.field.widget.input_type }}"
+                                       id="{{ field.auto_id }}"
+                                       name="{{ field.html_name }}"
+                                       placeholder="{{ field.label }}"
+                                       value="{{ field.value|default_if_none:'' }}"
+                                       class="form-control
+                                        {% if field.errors %}
+                                            is-invalid
+                                        {% endif %}"
+
+                                >
+                            {% endif %}
+                            <div class="invalid-feedback">
+                                {% for error in field.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                            {% if field.auto_id == "id_description" %}
+                                <hr>
+
+                                <h6><u><strong>Ocal API Settings</strong></u></h6>
+                            {% endif %}
+                            {% if field.auto_id == "id_feature_data_visible" %}
+                                <hr>
+                                <h6><u><strong>Subspace Information</strong></u>
+                                <label for="name" class="col-sm-2 col-form-label">
+                            <i class="fa fa-fw fa-question-circle"
+                               data-toggle="tooltip" data-placement="top"
+                               title="Please refer to your used feature file to enter your desired feature
+                               e.g. [[Feature x id, Feature y id]]
+                               Gridpoint is an array per subspace containing observations to score, full format for subspace_grids with S subspaces is [data_subspace1, ..., data_subspaceS]"
+                            ></i>
+                        </label></h6>
+                            {% endif %}
+                            {% if field.auto_id == "id_number_of_iterations" %}
+                                <hr>
+                                <h6><u><strong>Active Learning</strong></u></h6>
+                            {% endif %}
+
+                        </div>
+
+                        {% if field.label == "Gamma" or field.label == "Cost function"%}
+                            <label for="name" class="col-sm-2 col-form-label">
+                                <i class="fa fa-fw fa-question-circle"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="{% if field.label == "Gamma" %}
+                                       Kernel parameter for the RBF kernel, e.g. 2
+                                        {% else %} Cost factor for the classifier, e.g. 0.05
+                                        {% endif %}"></i>
+                            </label>
+                        {% endif %}
+
+                        {% if field.help_text %}
+                            <label for="name" class="col-sm-2 col-form-label">
+                                <i data-toggle="tooltip" data-placement="top"
+                                   title="" class="fa fa-fw fa-question-circle"
+                                   data-original-title="{{ field.help_text|safe }}"></i>
+                            </label>
+                        {% endif %}
+
+                    </div>
+                {% endfor %}
+
+                {{ subspace_formset.management_form }}
+                <div class="formset_row">
+                    {% for field in subspace_formset %}
+                        {% for x in field %}
+                            {% if x.field.widget.input_type == "number" %}
+
+                                <div class="form-group row">
+                                    <label for="name" class="col-sm-4 col-form-label text-right">
+                                        {{ x.label }}:
+                                        <i class="fa fa-fw fa-asterisk required-field"></i>
+                                    </label>
+                                    <div class="col-sm-6">
+
+                                        <input type="{{ x.field.widget.input_type }}" id="{{ x.auto_id }}" value=""
+                                               name="{{ x.html_name }}"
+                                               placeholder="{{ x.label }}"
+                                               class="form-control">
+                                    </div>
+                                </div>
+
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+
+                <div class="form-group row mb-0">
+                    <div class="offset-md-4 col-md-6">
+                        <button type="submit" class="btn btn-primary">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+        $('.formset_row').formset({
+            addText: 'Add',
+            deleteText: 'Remove',
+            prefix: 'subspace_set',
+            deleteCssClass: 'btn btn-danger',
+            addCssClass: 'add-row btn btn-success form-group',
+            formCssClass: 'family-form',
+        });
+    </script>
+{% endblock %}
+

@@ -1,0 +1,353 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en_US">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/preflight.min.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="{% static "/assets/css/font-awesome.min.css" %}">
+    <link rel="stylesheet" href="{% static "/assets/css/bootstrap-social.css" %}">
+
+    <!-- Styles -->
+    <link href="{% static "/assets/css/app.css" %}" rel="stylesheet">
+    <link href="{% static "/assets/css/custom.css" %}" rel="stylesheet">
+
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static "/assets/plugins/select2-4.0.5/css/select2.min.css" %}">
+    <link rel="stylesheet" href="{% static "/assets/plugins/select2-4.0.5/themes/select2-bootstrap4.min.css" %}">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/utilities.min.css" rel="stylesheet">
+
+    {% block styles %}{% endblock %}
+
+    {% if user.is_authenticated %}
+        <script>
+            window.User = {
+                id: "{{ user.id }}",
+                username: "{{ user.get_username }}",
+            };
+            window.App = {
+                current_path: "{{ request.path }}",
+                current_route: null,
+            };
+        </script>
+    {% else %}
+        <script>
+            window.User = {};
+            window.App = {
+                current_path: "{{ request.path }}",
+                current_route: null,
+            };
+        </script>
+    {% endif %}
+</head>
+<body>
+<div id="app">
+    <nav class="navbar navbar-expand-md navbar-light navbar-ifs">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url "home" %}">
+                <img src="{% static "assets/images/Logo.png" %}" style="height: 50px;"
+                     alt="Interactive Feedback System">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- Left Side Of Navbar -->
+                <ul class="navbar-nav mr-auto">
+                </ul>
+
+                <!-- Right Side Of Navbar -->
+                <ul class="navbar-nav ml-auto">
+                    <!-- Authentication Links -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown"
+                            style="flex-direction: column;"
+                        >
+                            <a id="navbarDropdown" class="nav-link  flex items-center justify-between"
+                               href="#" role="button"
+                               data-toggle="dropdown"
+                               style="min-width: 150px; margin: auto;"
+                            >
+                                    <span class="">
+                                        {{ user.username }}
+                                    </span>
+                                <i class="fa fa-fw fa-2x fa-caret-down"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"
+                                 style="width: 100%;"
+                            >
+                                {% if user.is_superuser %}
+                                    <a class="dropdown-item  flex items-center justify-between"
+                                       href="{% url 'admin:index' %}">
+                                        User-system
+                                        <i class="fa fa-fw fa-user"></i>
+                                    </a>
+                                {% endif %}
+                                <a class="dropdown-item  flex items-center justify-between" href="{% url 'logout' %}">
+                                    Log Out
+                                    <i class="fa fa-fw fa-sign-out"></i>
+                                </a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url "login" %}">
+                                Log In
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Loading Animation -->
+    <div class="loading" style="display: none; padding-left: 100px">
+        <br>
+        <div class="spinner-border text-primary" role="status">
+        </div>
+        <b>Loading...</b>
+    </div>
+
+    <main class="py-4">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-sm-11">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                {% if user.is_authenticated and user.is_superuser and request.path != "/" %}
+                    <div class="col-md-2">
+                        <div class="card nav-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                Datasets
+                                <i class="fa fa-fw fa-area-chart"></i>
+                            </div>
+                            <div class="nav-tabs">
+                                <ul class="nav">
+                                    <li class="{% if request.path ==  "/adminapp/datasets/new" %}active{% endif %}">
+                                        <a href="/adminapp/datasets/new">
+                                            <i class="fa fa-fw mr-2 fa-plus"></i> Create Dataset
+                                        </a>
+                                    </li>
+
+                                    <li class="{% if request.path ==  "/adminapp/datasets/" %}active{% endif %}">
+                                        <a href="/adminapp/datasets">
+                                            <i class="fa fa-fw mr-2 fa-list"></i> List Datasets
+                                        </a>
+                                    </li>
+                                    {% if dataset %}
+                                        <li class="{% if request.path == dataset.get_absolute_url %}active{% endif %}">
+                                            <a href="{{ dataset.get_absolute_url }}">
+                                                <i class="fa fa-fw fa-eye mr-2"></i> Dataset Profile
+                                            </a>
+                                        </li>
+                                        <li class="{% if request.path == dataset.get_update_url %}active{% endif %}">
+                                            <a href="{{ dataset.get_update_url }}">
+                                                <i class="fa fa-fw fa-edit mr-2"></i> Edit Dataset
+                                            </a>
+                                        </li>
+                                        <li class="{% if request.path == dataset.get_delete_url %}active{% endif %}
+                                            delete-link">
+                                            <a href="{{ dataset.get_delete_url }}">
+                                                <i class="fa fa-fw fa-trash mr-2"></i> Delete Dataset
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card nav-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                Setups
+                                <i class="fa fa-fw fa-wrench"></i>
+                            </div>
+
+                            <div class="nav-tabs">
+                                <ul class="nav">
+                                    <li class="{% if request.path ==  "/adminapp/setups/new" %}active{% endif %}">
+                                        <a href="/adminapp/setups/new">
+                                            <i class="fa fa-fw mr-2 fa-plus"></i> Create Setup
+                                        </a>
+                                    </li>
+
+                                    <li class="{% if request.path ==  "/adminapp/setups/" %}active{% endif %}">
+                                        <a href="/adminapp/setups">
+                                            <i class="fa fa-fw mr-2 fa-list"></i> List Setups
+                                        </a>
+                                    </li>
+
+                                    {% if setup %}
+                                        <li class="{% if request.path == setup.get_absolute_url %}active{% endif %}">
+                                            <a href="{{ setup.get_absolute_url }}">
+                                                <i class="fa fa-fw fa-eye mr-2"></i> Setup Profile
+                                            </a>
+                                        </li>
+                                        {% if setup.status != "final" %}
+                                            <li class="{% if request.path == setup.get_update_url %}active{% endif %}">
+                                                <a href="{{ setup.get_update_url }}">
+                                                    <i class="fa fa-fw fa-edit mr-2"></i> Edit Setup
+                                                </a>
+                                            </li>
+                                        {% endif %}
+
+                                        <li class="{% if request.path == setup.get_delete_url %}active{% endif %} delete-link">
+                                            <a href="{{ setup.get_delete_url }}">
+                                                <i class="fa fa-fw fa-trash mr-2"></i> Delete Setup
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card nav-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                Experiments
+                                <i class="fa fa-fw fa-flask"></i>
+                            </div>
+
+                            <div class="nav-tabs">
+                                <ul class="nav">
+                                    <li class="{% if request.path ==  "/adminapp/experiments/new" %}active{% endif %}">
+                                        <a href="/adminapp/experiments/new">
+                                            <i class="fa fa-fw mr-2 fa-plus"></i> Create Experiment
+                                        </a>
+                                    </li>
+
+                                    <li class="{% if request.path ==  "/adminapp/experiments/" %}active{% endif %}">
+                                        <a href="/adminapp/experiments">
+                                            <i class="fa fa-fw mr-2 fa-list"></i> List Experiments
+                                        </a>
+
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    {% if user.is_authenticated and not user.is_superuser and request.path != "/" %}
+                        <div class="col-md-2">
+                            <div class="card nav-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    Invitations
+                                    <i class="fa fa-envelope-o"></i>
+                                </div>
+
+                                <div class="nav-tabs">
+                                    <ul class="nav">
+                                        <li class="{% if request.path == "/userapp/{{ user.pk }}/invitations" %}active{% endif %}">
+                                            <a href="/userapp/{{ user.pk }}/invitations">
+                                                <i class="fa fa-fw mr-2 fa-list"></i> See Invitations
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card nav-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    My Experiments
+                                    <i class="fa fa-fw fa-flask"></i>
+                                </div>
+                                <div class="nav-tabs">
+                                    <ul class="nav">
+                                        <li class="{% if request.path ==  "/userapp/{{ user.pk}}/ongoing_experiments" %}active{% endif %}">
+                                            <a href="/userapp/{{ user.pk }}/ongoing_experiments">
+                                                <i class="fa fa-fw mr-2 fa-list"></i> List Ongoing Experiments
+                                            </a>
+
+                                        </li>
+                                        <li class="{% if request.path ==  "/userapp/{{ user.pk}}/participated_experiments" %}active{% endif %}">
+                                            <a href="/userapp/{{ user.pk }}/participated_experiments">
+                                                <i class="fa fa-fw mr-2 fa-list"></i> List Participated Experiments
+                                            </a>
+
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                <div class="col-md-9">
+
+                    {% block breadcrumbs %}
+                    {% endblock %}
+
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Scripts -->
+<script src="{% static "/assets/js/app.js" %}"></script>
+<script src="{% static 'assets/js/jquery.formset.js' %}"></script>
+<script src="{% static 'assets/js/timeme.js' %}"></script>
+<script src="{% static "/assets/plugins/select2-4.0.5/js/select2.full.min.js" %}"></script>
+<script>
+    $(function () {
+        $.fn.select2.defaults.set("theme", "bootstrap4");
+
+        $('.select2').select2({
+            width: "100%",
+            allowClear: false,
+        });
+
+        $(document).on('change', '.select2', function () {
+            noValidation = $(this).closest('.form-group').hasClass('no-validation');
+
+            if (noValidation) {
+                return;
+            }
+
+            $(this).valid();
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+
+        $(".nav li.disabled a").on('click', function () {
+            return false;
+        });
+    });
+</script>
+
+<script>
+    if ($("#export").length < 1) {
+        window.onbeforeunload = function (event) {
+            $('.loading').show();
+        }
+    }
+
+    $("button[type='submit']").on("click", function (e) {
+        $(this).attr("disabled", true);
+        $(this).closest("form").submit()
+    });
+</script>
+
+{% block scripts %}
+
+{% endblock %}
+</body>
+</html>

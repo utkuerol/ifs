@@ -1,0 +1,14 @@
+/.idea
+*.pyc
+db.sqlite3
+adminapp/migrations
+*.iml
+node_modules
+*.cache
+*.pdf
+/media
+/venv
+/venv1
+Pipfile
+/test_data/mnist_raw.json
+/test_data/WashingMachine_PhaseCount_3_geq_2017-10-23_lt_2017-10-30.json

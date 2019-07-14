@@ -1,0 +1,59 @@
+{% extends 'layouts/app.html' %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                Setups
+            </li>
+            <li class="breadcrumb-item">
+                Delete Setup
+            </li>
+            <li class="breadcrumb-item active">
+                {{ setup.name }}
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block title %}Delete Setup{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header flex items-center justify-between">
+            <div>Are you sure you want to delete the session with setup "<b>{{ object.setup_id.name }}</b>" and
+                participating user "<b>{{ object.user_id.username }}</b>" ?
+            </div>
+            <a href="/adminapp/experiments/{{ object.id }}" class="hover:text-red">
+                Back
+            </a>
+        </div>
+        <div class="card-body">
+
+            <form method="post">{% csrf_token %}
+
+                <p><b>Name: </b>{{ session.setup_id.name }}</p>
+                <p><b>Description: </b>{{ session.setup_id.description }}</p>
+                <p><b>Participating User: </b>{{ session.user_id.username }}</p>
+                <p><b>Status: </b>{{ session.status }}</p>
+                <p><b>Created At: </b>{{ session.date }}</p>
+                <p><b>Type: </b>{{ session.setup_id.dataset_id.type }}</p>
+
+
+                <div class="form-group row mb-0">
+                    <div class="col-md-6">
+                        <input type="submit" class="btn btn-primary" value="Confirm">
+                    </div>
+                </div>
+
+            </form>
+
+
+        </div>
+    </div>
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'layouts/app.html' %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                Datasets
+            </li>
+            <li class="breadcrumb-item">
+                Delete Dataset
+            </li>
+            <li class="breadcrumb-item active">
+                {{ dataset.name }}
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+{% block title %}Delete Dataset{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header flex items-center justify-between">
+            <div>Are you sure you want to delete "<b>{{ object.name }}</b>"?</div>
+            <a href="/adminapp/datasets/{{ dataset.id }}" class="hover:text-red">
+                Back
+            </a>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <p><b>Name: </b>{{ dataset.name }}</p>
+                <p><b>Description: </b>{{ dataset.description }}</p>
+                <p><b>Created At: </b>{{ dataset.date }}</p>
+                <p><b>Type: </b>{{ dataset.type }}</p>
+                <p>
+                    <b>Feature File: </b>
+                    <a href="/media/{{ dataset.feature_file }}" download>{{ dataset.feature_file }}</a>
+                </p>
+                <p><b>Raw File: </b><a href="/media/{{ dataset.raw_file }}" download>{{ dataset.raw_file }}</a></p>
+
+                <div class="form-group row mb-0">
+                    <div class="col-md-6">
+                        <input type="submit" class="btn btn-primary" value="Confirm">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,401 @@
+{% extends 'layouts/app.html' %}
+
+{% block title %}Iteration{% endblock %}
+
+{% block styles %}
+    {% if setup.feature_data_visible == 'Yes' %}
+
+        <style>
+            .mpld3-tooltip {
+                font-size: 14px !important;
+            }
+        </style>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+
+        <div class="card-header flex items-center justify-between">
+            <div>
+                <b>Question:</b> {{ experiment_info.iteration_order }} / {{ setup.number_of_iterations }}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="subspaces"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        See another Subspace
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {% for subspace in setup.subspace_set.all %}
+                            {% if subspace != setup.subspace_set.first %}
+                                <a class="dropdown-item new-subspace"
+                                   id="subspace_toggle_{{ subspace.id }}"
+                                   data-id="{{ subspace.id }}"
+                                   data-text="Subspace ({{ subspace.feature_x_id }}, {{ subspace.feature_y_id }})"
+                                > Subspace
+                                    ({{ subspace.feature_x_id }}, {{ subspace.feature_y_id }}) </a>
+                            {% else %}
+                                <a class="dropdown-item new-subspace active"
+                                   id="subspace_toggle_{{ subspace.id }}"
+                                   data-id="{{ subspace.id }}"
+                                   data-text="Subspace ({{ subspace.feature_x_id }}, {{ subspace.feature_y_id }})"
+                                > Subspace
+                                    ({{ subspace.feature_x_id }}, {{ subspace.feature_y_id }}) &nbsp; &nbsp;
+                                    &#10003; </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <a href="{% url 'home' %}" class="btn btn-light mx-2">Save & Quit</a>
+                <a href="{% url 'delete-experiment' experiment_info.session_id %}"
+                   class="btn btn-light mx-2 hover:text-red">
+                    Abort Experiment
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-8 custom-scroll flex flex-col items-center " id="visualization"
+                     style="height: 700px;  overflow-y: scroll;">
+                    <span class="subspaces-span"><b>Please scroll down for more subspaces</b></span>
+                    <div style="" class="subspaces" id="{{ figid }}"></div>
+
+                    {% for subspace in setup.subspace_set.all %}
+
+                        <div id="{{ subspace.id }}_container">
+
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="col-sm-4">
+                    {% if setup.feedback_mode == "user" and  experiment_info.selected_obj_id == None %}
+                        <h5>Please select an object by clicking on a datapoint.</h5>
+                    {% endif %}
+                    {% if setup.feedback_mode != "user"  or  experiment_info.selected_obj_id != None %}
+                        {% if setup.feedback_mode == "system" or setup.feedback_mode == "hybrid" %}
+                            <p><b>Asked Object: </b>{{ experiment_info.ocal_query_id }}</p>
+                            {% if setup.feedback_mode != "user" and experiment_info.selected_obj_id == None %}
+                                <div id="bodydesc"
+                                     class="w-full border mb-3 p-3 custom-scroll"
+                                     style="height: 300px; overflow-y: scroll;">
+                                    <table style="width:100%">
+                                        {% for f,m in object_values %}
+                                            <tr>
+                                                <td><b>{{ f }}</b></td>
+                                                <td>{{ m }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        {% if setup.feedback_mode != "system" %}
+                            <p><b>Selected Object: </b>{{ experiment_info.selected_obj_id }}</p>
+                            {% if experiment_info.selected_obj_id != None %}
+                                <div id="bodydesc"
+                                     class="w-full border mb-3 p-3 custom-scroll"
+                                     style="height: 300px; overflow-y: scroll;">
+                                    <table style="width:100%">
+                                        {% for f,m in object_values %}
+                                            <tr>
+                                                <td><b>{{ f }}</b></td>
+                                                <td>{{ m }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        <p><b>Global Prediction: </b>{{ experiment_info.ocal_prediction }}</p>
+
+
+                        <form enctype="multipart/form-data" method="post">
+                            {% csrf_token %}
+
+                            <div class="form-group no-validation">
+                                What do you think about it?
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="user_feedback" id="inlier"
+                                       value="inlier" checked>
+                                <label class="form-check-label" for="inlier">
+                                    Inlier
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="user_feedback" id="outlier"
+                                       value="outlier">
+                                <label class="form-check-label" for="exampleRadios2">
+                                    Outlier
+                                </label>
+                            </div>
+
+                            {% if setup.unknown_allowed == "Yes" %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="user_feedback" id="unknown"
+                                           value="unknown">
+                                    <label class="form-check-label" for="exampleRadios2">
+                                        Unknown
+                                    </label>
+                                </div>
+                            {% endif %}
+                            {% if experiment_info.remaining_iterations != 0 %}
+                                <div class="form-group mb-0">
+                                    <div class="offset-md-4 col-md-6">
+                                        <input type="hidden" name="action" value="Next">
+                                        <button type="submit" class="btn btn-primary">
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="form-group mb-0">
+                                    <div class="offset-md-4 col-md-6">
+                                        <input type="hidden" name="action" value="Finish">
+                                        <button type="submit" class="btn btn-primary">
+                                            Finish
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </form>
+                        <!-- Subspace Selection -->
+
+                    {% endif %}
+                    <br>
+                    <form enctype="multipart/form-data" method="post">
+                        {% csrf_token %}
+                        {% if experiment_info.iteration_order != 1 %}
+                            <div class="form-group row mb-0">
+                                <div class="offset-md-4 col-md-6">
+                                    <input type="hidden" name="action" value="Back">
+                                    <button title="Will reset the last iteration" type="submit" class="btn btn-primary">
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if setup.raw_data_visible == "Yes" %}
+        {% if setup.feedback_mode != "user" or setup.feedback_mode == "user" and experiment_info.selected_obj_id != null %}
+
+            <div class="card">
+                <div class="card-header" style="font-weight: bold">Raw Data</div>
+
+                <div class="card-body">
+                    {% if setup.dataset_id.type == "MNIST" %}
+                        <div style="display:table-cell; vertical-align:middle; text-align:center"><img
+                                src="{{ image_path }}" alt="raw image"></div>
+                    {% endif %}
+
+                    {% if setup.dataset_id.type == "HIPE" %}
+                        <div style="display:table-cell; vertical-align:middle; text-align:center">
+                            <embed
+                                    src="{{ image_path }}" type="application/pdf" alt="raw image"
+                                    style="height: 500px; width: 700px">
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    {% for elem in graph %}
+        {{ elem|safe }}
+    {% endfor %}
+
+    <script>
+
+
+        var clicked = false; // For preventing double click in graphs
+        var startTime = (new Date()).getTime();
+
+        window.onbeforeunload = function (event) {
+            $('.loading').show();
+            var endTime = (new Date()).getTime();
+            var timeSpent = endTime - startTime;
+            var timeSpentInSeconds = timeSpent / 1000;
+            timeSpentInSeconds = Math.round(timeSpentInSeconds);
+
+            var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+            let subspaces = {};
+
+            console.log(window.subSpaceTimes);
+            console.log(window.subSpaceTimeCounter);
+
+            $.each(window.subSpaceTimeCounter, function (index, value) {
+                console.log(value)
+
+                if (value != null) {
+                    let endTime = (new Date()).getTime();
+                    let duration = Math.round((endTime - value) / 1000);
+                    console.log('Duration: ' + duration);
+
+                    window.subSpaceTimes[index] += duration;
+                    window.subSpaceTimeCounter[index] = null;
+                }
+            });
+
+            $.each(window.subSpaceTimes, function (index, value) {
+                subspaces[index] = value;
+            });
+
+            console.log(subspaces);
+
+            var selected_obj = "";
+            {%  if experiment_info.selected_obj_id != null %}
+                selected_obj = {{ experiment_info.selected_obj_id }};
+            {% endif %}
+
+            let content = {
+                duration: timeSpentInSeconds,
+                iteration_id: {{ iteration_id }},
+                subspaces: subspaces,
+                selected_obj: selected_obj,
+            };
+
+            $.ajax({
+                url: '{% url 'duration' %}',
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/json',
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+
+                data: JSON.stringify(content),
+
+                success: console.log("Success! Time Spent: " + timeSpentInSeconds)
+
+            });
+        }
+
+
+        $(function () {
+            window.activeSubSpaces = [];
+
+            window.mainTime = 0;
+            window.subSpaceTimes = {};
+            window.subSpaceTimeCounter = {};
+
+            $(".new-subspace").each(function (index, value) {
+                let id = $(this).data('id');
+
+                subSpaceTimes[id] = 0;
+
+                if ($(this).hasClass('active')) {
+                    window.activeSubSpaces.push(id);
+                    $(".subspaces-span").hide();
+                    subSpaceTimeCounter[id] = (new Date()).getTime();
+                } else {
+                    subSpaceTimeCounter[id] = null;
+                }
+            });
+        });
+
+        function isInArray(value, array) {
+            return array.indexOf(value) > -1;
+        }
+
+        function isActive(id) {
+            return isInArray(id, window.activeSubSpaces);
+        }
+
+        function arrayRemove(array, value) {
+            let index = array.indexOf(value);
+            if (index > -1) {
+                array.splice(index, 1);
+            }
+            return array;
+        }
+
+
+        $(".new-subspace").click(function () {
+            $(this).toggleClass('active');
+
+            let id = $(this).data("id");
+            let text = $(this).data('text');
+            let graphContainerId = '#graph_subspace_' + id + '_div';
+            let startTime;
+
+            let active = isActive(id);
+
+            console.log(active);
+            console.log(graphContainerId);
+
+            if (active) {
+                if (window.activeSubSpaces.length == 1) {
+                    alert("You must have at least one subspace.");
+                    $(this).toggleClass('active');
+                    return;
+                }
+
+
+
+                // Get the current time, subtract the starting time from it and add to the global counter.
+                let endTime = (new Date()).getTime();
+                let duration = Math.round((endTime - window.subSpaceTimeCounter[id]) / 1000);
+                window.subSpaceTimes[id] += duration;
+                window.subSpaceTimeCounter[id] = null;
+
+                window.activeSubSpaces = arrayRemove(window.activeSubSpaces, id);
+                if (window.activeSubSpaces.length == 1) {
+                    $(".subspaces-span").hide();
+                }
+                $(this).text(text);
+
+                if ($(graphContainerId).length) {
+                    $(graphContainerId).hide();
+                }
+            } else {
+                // Start timer for the subspace
+                window.subSpaceTimeCounter[id] = (new Date()).getTime();
+                window.activeSubSpaces.push(id);
+                $(".subspaces-span").show();
+                $(this).html(text + "&nbsp;&nbsp;&#10003;");
+
+                if ($(graphContainerId).length) {
+                    $(graphContainerId).show();
+                } else {
+                    $("#" + id + '_container').load("{% url 'subspacevis' %}", {
+                        subspace_id: id.toString().replace('subspace_toggle_', ''),
+                        iteration_id: {{iteration_id}},
+                        selected_obj_id:
+                            {% if experiment_info.selected_obj_id != None  %}
+                                {{ experiment_info.selected_obj_id }}
+                            {% else %}
+                                ''
+                            {% endif %},
+                    });
+
+                    $(".new-subspace").addClass("disableClick")
+                    setTimeout(function () {
+                        $(".new-subspace").removeClass("disableClick");
+                    }, 1000);
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

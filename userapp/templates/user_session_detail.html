@@ -1,0 +1,46 @@
+{% extends 'layouts/app.html' %}
+
+{% block title %}Session Profile{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-header flex items-center justify-between">
+            <b>Session Profile</b>
+        </div>
+
+        <div class="card-body">
+            <p><b>Session ID: </b>{{ session.id }}</p>
+            <p><b>Setup Name: </b>{{ session.setup_id.name }}</p>
+            <p><b>Description: </b>{{ session.setup_id.description }}</p>
+            <p><b>Feedback Mode: </b>{{ session.setup_id.feedback_mode }}</p>
+            <p><b># Questions: </b>{{ session.setup_id.number_of_iterations }}</p>
+            <p><b>Status: </b>{{ session.status }}</p>
+            <p><b>Created At: </b>{{ session.date }}</p>
+            <p><b>Type: </b>{{ session.setup_id.dataset_id.type }}</p>
+
+            <hr>
+            {% if session.status == "accepted" or session.status == "finished" or session.status == "not_completed"%}
+                <table class="table table-striped table-hover m-0">
+                    <tr>
+                        <th>Question</th>
+                        <th>Duration (Seconds)</th>
+                        <th>Object answered</th>
+                        <th>OCALAPI Prediction</th>
+                        <th>User Feedback</th>
+                    </tr>
+                    {% for iteration in session.iteration_set.all %}
+                    <tr>
+                        <td>{{ iteration.iteration_order }}</td>
+                        <td>{{ iteration.duration }}</td>
+                        <td>{{ iteration.ocal_query_id }}</td>
+                        <td>{{ iteration.ocal_prediction }}</td>
+                        <td>{{ iteration.user_feedback }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

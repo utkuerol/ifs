@@ -1,0 +1,170 @@
+{% extends 'layouts/app.html' %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                Setups
+            </li>
+            <li class="breadcrumb-item">
+                Edit Setup
+            </li>
+            <li class="breadcrumb-item active">
+                {{ setup.name }}
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block title %}Edit Setup{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header flex items-center justify-between">
+            <b>Edit Setup</b>
+
+            <a href="/adminapp/setups/{{ setup.id }}" class="hover:text-red">
+                Back
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="alert alert-info">
+                <strong>Please enter the information. </strong>
+                The required fields are marked with the <i class="fa fa-fw fa-asterisk required-field"></i> sign.
+            </div>
+
+            <form enctype="multipart/form-data" method="post">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="form-group no-validation row">
+                        <label for="name" class="col-sm-4 col-form-label text-right">
+                            {{ field.label }}:
+                            <i class="fa fa-fw fa-asterisk required-field"></i>
+                        </label>
+                        <div class="col-sm-6">
+                            {% if field.field.widget.input_type == "select" %}
+                                <select data-placeholder="{{ field.label }}"
+                                        class="form-control select2 {% if field.errors %}
+                                            is-invalid
+                                        {% endif %}"
+                                        name="{{ field.html_name }}"
+                                        id="{{ field.auto_id }}"
+                                        data-allow-clear="true"
+                                >
+                                    {% for key,value in field.field.widget.choices %}
+                                        {% if key %}
+                                            {% if field.value == key %}
+                                                <option value="{{ key }}" selected>{{ value }}</option>
+                                            {% else %}
+                                                <option value="{{ key }}">{{ value }}</option>
+                                            {% endif %}
+                                        {% else %}
+                                            <option></option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+
+                            {% elif field.field.widget.input_type == "file" %}
+                                <div class="custom-file">
+                                    <input
+                                            id="{{ field.auto_id }}"
+                                            name="{{ field.html_name }}"
+                                            type="file"
+                                            class="custom-file-input"
+                                            required
+                                    >
+                                    <label class="custom-file-label" for="validatedCustomFile">Choose a file...</label>
+                                </div>
+                            {% elif field.label == "Gamma" or field.label == "Cost function" %}
+                                <input type="{{ field.field.widget.input_type }}" step="any" id="{{ field.auto_id }}"
+                                       name="{{ field.html_name }}"
+                                       placeholder="{{ field.label }}"
+                                       value="{{ field.value|default_if_none:'' }}"
+                                       class="form-control
+                                        {% if field.errors %}
+                                            is-invalid
+                                        {% endif %}">
+                            {% else %}
+                                <input type="{{ field.field.widget.input_type }}" id="{{ field.auto_id }}"
+                                       name="{{ field.html_name }}"
+                                       placeholder="{{ field.label }}"
+                                       value="{{ field.value|default_if_none:'' }}"
+                                       class="form-control
+                                        {% if field.errors %}
+                                            is-invalid
+                                        {% endif %}">
+                            {% endif %}
+
+                            <div class="invalid-feedback">
+                                {% for error in field.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if field.help_text %}
+                            <label for="name" class="col-sm-2 col-form-label">
+                                <i data-toggle="tooltip" data-placement="top"
+                                   title="" class="fa fa-fw fa-question-circle"
+                                   data-original-title="{{ field.help_text|safe }}"></i>
+                            </label>
+                        {% endif %}
+
+                    </div>
+                {% endfor %}
+
+                {{ subspace_formset.management_form }}
+
+                {% for field in subspace_formset %}
+                    <div class="formset_row">
+                        {{ field.id }}
+                        {{ field.DELETE }}
+                        {{ field.setup_id }}
+                        {% for x in field %}
+                            {% if x.field.widget.input_type == "number" %}
+
+                                <div class="form-group row">
+                                    <label for="name" class="col-sm-4 col-form-label text-right">
+                                        {{ x.label }}:
+                                        <i class="fa fa-fw fa-asterisk required-field"></i>
+                                    </label>
+                                    <div class="col-sm-6">
+
+                                        <input type="{{ x.field.widget.input_type }}" id="{{ x.auto_id }}"
+                                               value="{{ x.value }}"
+                                               name="{{ x.html_name }}"
+                                               placeholder="{{ x.label }}"
+                                               class="form-control">
+                                    </div>
+                                </div>
+
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <div class="form-group row mb-0">
+                    <div class="offset-md-4 col-md-6">
+                        <button type="submit" class="btn btn-primary">
+                            Save
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+        $('.formset_row').formset({
+            addText: 'Add',
+            deleteText: 'Remove',
+            prefix: 'subspace_set',
+            deleteCssClass: 'btn btn-danger',
+            addCssClass: 'add-row btn btn-success form-group',
+            formCssClass: 'family-form',
+        });
+    </script>
+{% endblock %}

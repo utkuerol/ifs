@@ -1,0 +1,139 @@
+{% extends 'layouts/app.html' %}
+{% load static %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                Setups
+            </li>
+            <li class="breadcrumb-item active">
+                Setups List
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block title %}Setups List{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-header flex items-center justify-between">
+            {% if dataset_obj is not none and dataset_obj != "all" %}
+                <b>Setup List (For dataset '{{ dataset_obj.name }}')</b>
+            {% else %}
+                <b>Setup List</b>
+            {% endif %}
+            <b>Filter by dataset :
+                <select onchange="filter_by_dataset()" name="dataset_select" id="dataset_select">
+                    <option disabled="disabled"></option>
+                    <option value="all">All</option>
+                    {% for dataset in datasets %}
+                        <option value={{ dataset.id }}>{{ dataset.name }}</option>
+                    {% endfor %}
+                </select></b>
+        </div>
+
+        <div class="card-body">
+            {% if setups %}
+                <table class="table table-striped table-hover m-0">
+                    <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        {% if dataset_obj is none %}
+                            <th scope="col">Dataset</th>
+                        {% endif %}
+                        <th scope="col">Description</th>
+                        <th scope="col">Creation Date</th>
+                        <th scope="col" class="text-center">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for setup in setups %}
+                        <tr>
+                            <td width="40px"><a id="setup_profile" href="{{ setup.get_absolute_url }}">
+                                <img
+                                        data-toggle="tooltip" data-placement="top" title="Click to see the setup."
+                                        src="{% static "assets/images/go.png" %}"/></a></td>
+                            <td scope="row">{{ setup.id }}</td>
+                            <td><a href="{{ setup.get_absolute_url }}">{{ setup.name }} </a></td>
+                            {% if dataset_obj is none %}
+                                <td><a href="{{ setup.dataset_id.get_absolute_url }}">{{ setup.dataset_id.name }}</a>
+                                </td>
+                            {% endif %}
+                            <td>{{ setup.description }} </td>
+                            <td>{{ setup.date }} </td>
+                            <td class="h-48px flex items-center justify-around">
+                                {% if setup.status == 'draft' %}
+                                    <span class="badge badge-success px-4 py-1">{{ setup.status }}</span>
+                                {% else %}
+                                    <span class="badge badge-warning px-4 py-1">{{ setup.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <br>
+
+                {% if is_paginated %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-left">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><a class="page-link" href="#"><span>&laquo;</span></a>
+                                </li>
+                            {% endif %}
+                            {% for i in paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ i }} <span
+                                            class="sr-only">(current)</span></a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><a class="page-link" href="#"><span>&raquo;</span></a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <h3 class="p-3 text-center">
+                    There are no setups to view.
+                </h3>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        {% if dataset_obj is not none and dataset_obj != "all" %}
+            found = false;
+            for (var i = 0; i < document.getElementById("dataset_select").options.length; i++) {
+                if (document.getElementById("dataset_select").options[i].value === "{{ dataset_obj.id }}") {
+                    document.getElementById("dataset_select").options[i].selected = true;
+                    found = true;
+                }
+            }
+            if (!found)
+                document.getElementById("dataset_select").options[0].selected = true;
+        {% endif %}
+
+        function filter_by_dataset() {
+            var value = document.getElementById("dataset_select").value;
+            window.location.href = "?dataset_id=" + value;
+        }
+    </script>
+{% endblock %}

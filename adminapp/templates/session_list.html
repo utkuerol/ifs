@@ -1,0 +1,143 @@
+{% extends 'layouts/app.html' %}
+{% load static %}
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                Experiments
+            </li>
+            <li class="breadcrumb-item active">
+                Experiments List
+            </li>
+        </ol>
+    </nav>
+{% endblock %}
+{% block title %}Experiments List{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-header flex items-center justify-between" style="font-weight: bold">
+            {% if selected_status is not none and selected_status != "all" %}
+                <b>Experiments List (Status: {{ selected_status }})</b>
+            {% else %}
+                <b>Experiments List</b>
+            {% endif %}
+            <b>Filter by status :
+                <select onchange="filter_by_status()" name="status_select" id="status_select">
+                    <option disabled="disabled"></option>
+                    <option value="all">All</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="finished">Finished</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="not_completed">Not-completed</option>
+                </select></b>
+        </div>
+        <div class="card-body">
+            {% if sessions %}
+                <table class="table table-striped table-hover m-0">
+                    <thead>
+                    <tr class="">
+                        <th scope="col"></th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Used Setup</th>
+                        <th scope="col">Invited User</th>
+                        <th scope="col">Creation Date</th>
+                        <th scope="col">Questions</th>
+                        <th scope="col" class="text-center">Status</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for session in sessions %}
+                        <tr>
+                            <td width="40px"><a id="session_profile" href="{{ session.get_absolute_url }}">
+                                <img
+                                        data-toggle="tooltip" data-placement="top" title="Click to see the session profile."
+                                        src="{% static "assets/images/go.png" %}"/></a></td>
+                            <td scope="row">{{ session.id }}</td>
+                            <td><a href="{{ session.setup_id.get_absolute_url }}">{{ session.setup_id.name }}</a></td>
+                            <td>{{ session.user_id }}</td>
+                            <td>{{ session.date }} </td>
+                            <td class>
+                                {% if session.iteration_set.all.last.iteration_order == None %}
+                                    0
+                                {% endif %}
+                                {{ session.iteration_set.all.last.iteration_order }}/{{ session.setup_id.number_of_iterations }}</td>
+                            <td class="h-48px flex items-center justify-around">
+                                {% if session.status == 'inactive' %}
+                                    <span class="badge badge-secondary px-4 py-1">{{ session.status }}</span>
+                                {% elif session.status == 'ongoing' %}
+                                    <span class="badge badge-primary px-4 py-1">{{ session.status }}</span>
+                                {% elif session.status == 'finished' %}
+                                    <span class="badge badge-warning px-4 py-1">{{ session.status }}</span>
+                                {% elif session.status == 'accepted' %}
+                                    <span class="badge badge-success px-4 py-1">{{ session.status }}</span>
+                                {% elif session.status == 'not_completed' %}
+                                    <span class="badge badge-dark px-2 py-1">{{ session.status }}</span>
+                                {% endif %}
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+                <br>
+
+                {% if is_paginated %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-left">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ page_obj.previous_page_number }}">&laquo;
+                                    {% else %}
+                                <li class="page-item disabled"><a class="page-link" href="#"><span>&laquo;</span></a>
+                                </li>
+                            {% endif %}
+                            {% for i in paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ i }} <span
+                                            class="sr-only">(current)</span></a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><a class="page-link" href="#"><span>&raquo;</span></a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <h3 class="p-3 text-center">
+                    There are no experiments to view.
+                </h3>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        {% if selected_status is not none and selected_status != "all" %}
+            found = false;
+            for (var i = 0; i < document.getElementById("status_select").options.length; i++) {
+                if (document.getElementById("status_select").options[i].value === "{{ selected_status }}") {
+                    document.getElementById("status_select").options[i].selected = true;
+                    found = true;
+                }
+            }
+            if (!found)
+                document.getElementById("status_select").options[0].selected = true;
+        {% endif %}
+
+        function filter_by_status() {
+            var value = document.getElementById("status_select").value;
+            window.location.href = "?status=" + value;
+        }
+    </script>
+
+{% endblock %}
