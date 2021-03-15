@@ -15,6 +15,10 @@ Other contributors of the project: Alaa Mousa, Ari Nubar Boyacioglu, Mazen Ebada
 
 ![Screenshot 2021-03-15 at 11 25 49](https://user-images.githubusercontent.com/29407306/111139266-39af5780-8581-11eb-9717-fefe22de8e95.png)
 
+### Use Case Diagram (German)
+
+![Screenshot 2021-03-15 at 11 36 30](https://user-images.githubusercontent.com/29407306/111140532-b7279780-8582-11eb-8993-4e4e97236e3e.png)
+
 # Build Instructions
 
 ```
